@@ -1,19 +1,33 @@
 const { Sequelize, DataTypes } = require("sequelize")
+const { v4: uuidv4 } = require("uuid")
 const config = require("../config/config.json")
 const models = require("../models")
 
-const { PAYMENTS } = require('../utils/sampleData')
-
-console.log(`connecting to ${config.development.database}`)
-const sequelize = new Sequelize(config.development)
-const queryInterface = sequelize.getQueryInterface()
+const newPayments = [
+  {
+    id: uuidv4(),
+    amount: 499.99,
+    status: "pending",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: uuidv4(),
+    amount: 799.99,
+    status: "pending",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+]
 
 const orderPayments = async () => {
   //await models.sequelize.sync()
   const orders = await models.Order.findAll()
-  await orders[0].createPayment(PAYMENTS[0])
-  await orders[0].createPayment(PAYMENTS[1])
-  console.log(`order[0] has ${await orders[0].countPayments()} payments`)
+  const order = orders[1]
+  console.log(`order ${order.id} has ${await order.countPayments()} payments`)
+  await order.createPayment(newPayments[0])
+  await order.createPayment(newPayments[1])
+  console.log(`order ${order.id} has ${await order.countPayments()} payments`)
 
   const payments = await orders[0].getPayments()
   console.log(`orders[0].getPayments() returned ${payments.length} payments`)
@@ -24,6 +38,7 @@ const orderPayments = async () => {
 
   // OrderId was set to null above
   //deletePayments(null)
+  await models.sequelize.close()
 }
 
 const deletePayments = async (id) => {
@@ -31,4 +46,3 @@ const deletePayments = async (id) => {
 }
 
 orderPayments()
-

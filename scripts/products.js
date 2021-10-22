@@ -1,20 +1,16 @@
 const models = require("../models")
 
 const products = async () => {
-  // get all orders
+  // get all products
   const products = await models.Product.findAll({
-    include: [
-      {
-        model: models.Tag,
-      },
-    ],
+    include: {
+      model: models.Tag
+    }
   })
-  
-  products.forEach(product => {
+
+  for (const product of products) {
     console.log(product.toJSON())
-    tags = product.getTags()
-    console.log(`${tags.length} tags found`)
-  });
+  }
 
   await models.sequelize.close()
 }
